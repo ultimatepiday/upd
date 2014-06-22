@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import upd
 from upd.model import *
 

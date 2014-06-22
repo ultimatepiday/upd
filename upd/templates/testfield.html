@@ -1,0 +1,10 @@
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="/test_field">
+  <dl>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.test_field) }}
+    {{ render_field(form.pie_group) }}
+    {{ render_field(form.ingredient_category) }}
+  </dl>
+  <p><input type=submit value=Submit /></p>
+</form>
