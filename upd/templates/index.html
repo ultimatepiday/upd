@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  {{ mustache('_test.mustache', title=title) |safe }}
+
+<div id="moo">
+</div>
+
+<script type="text/javascript" >
+  $('#moo').mustache('_test.mustache', {title:'Moo'});
+</script>
+
+{% endblock %}

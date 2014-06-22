@@ -1,0 +1,10 @@
+DEBUG = True
+SECRET_KEY = 'I am a secret key! Look at me, the secret key. Now on github!'
+HOST = '127.0.0.1'
+PORT = 5555
+SQLALCHEMY_DATABASE_URI = 'mysql://upd:password@localhost/upd'
+SQLALCHEMY_BINDS = {
+  'upd':  'mysql://upd:password@localhost/upd',
+  'sr26': 'mysql://upd:password@localhost/upd'
+}
+#SQLALCHEMY_ECHO = True
