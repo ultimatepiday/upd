@@ -197,6 +197,7 @@ class WEIGHT(db.Model):
   __bind_key__ = 'sr26'
   __table_args__ = {'schema' : 'sr26'}
   NDB_No = db.Column(db.CHAR(5), db.ForeignKey('sr26.FOOD_DES.NDB_No'), primary_key = True)
+  food_desc = db.relationship('FOOD_DES', backref=db.backref('q_weights', lazy='dynamic'))
   Seq = db.Column(db.CHAR(2), primary_key = True)
   Amount = db.Column(db.FLOAT(5, 3))
   Msre_Desc = db.Column(db.VARCHAR(84))
