@@ -11,10 +11,11 @@ db = SQLAlchemy(app)
 class Ingredient(object):
   query = db.session.query_property()
 
-  def __init__(self, recipe_num, NDB_No, quantity):
+  def __init__(self, recipe_num, NDB_No, Seq, weight_value):
     self.recipe_num = recipe_num
     self.NDB_No = NDB_No
-    self.quantity = quantity
+    self.Seq = Seq
+    self.weight_value = weight_value
 
   def __repr__(self):
     return '<Ingredient %s>' % (str(self.recipe_num) + " - " + self.NDB_No)
@@ -23,7 +24,8 @@ class Ingredient(object):
 ingredients_tbl = db.Table('ingredients_tbl',
   db.Column('recipe_num', db.INT(), db.ForeignKey('upd.Recipe.recipe_num'), primary_key=True),
   db.Column('NDB_No', db.CHAR(5), db.ForeignKey('sr26.FOOD_DES.NDB_No'), primary_key=True),
-  db.Column('quantity', db.INT()),
+  db.Column('Seq', db.CHAR(2), db.ForeignKey('sr26.WEIGHT.Seq')),
+  db.Column('weight_value', db.INT()),
   info={'bind_key': 'upd'},
   schema='upd',
 )
@@ -171,6 +173,17 @@ class FOOD_DES(db.Model):
   def __repr__(self):
     return "<FOOD_DES %s>" % self.Long_Desc
 
+  @property
+  def serialize(self):
+    """Return object data in easiliy serializable format"""
+    return {
+      'NDB_No': self.NDB_No,
+      'FdGrp_Cd': self.FdGrp_Cd,
+      'Long_Desc': self.Long_Desc,
+      'Shrt_Desc': self.Shrt_Desc,
+    }
+    
+
 class FD_GROUP(db.Model):
   __bind_key__ = 'sr26'
   __table_args__ = {'schema' : 'sr26'}
@@ -179,6 +192,14 @@ class FD_GROUP(db.Model):
 
   def __repr__(self):
     return "<FD_GROUP %s>" % self.FdGrp_Desc
+
+  @property
+  def serialize(self):
+    """Return object data in easiliy serializable format"""
+    return {
+      'FdGrp_Cd': self.FdGrp_Cd,
+      'FdGrp_Desc': self.FdGrp_Desc,
+    }
 
 class NUTR_DEF(db.Model):
   __bind_key__ = 'sr26'
@@ -198,7 +219,7 @@ class WEIGHT(db.Model):
   __table_args__ = {'schema' : 'sr26'}
   NDB_No = db.Column(db.CHAR(5), db.ForeignKey('sr26.FOOD_DES.NDB_No'), primary_key = True)
   food_desc = db.relationship('FOOD_DES', backref=db.backref('q_weights', lazy='dynamic'))
-  Seq = db.Column(db.CHAR(2), primary_key = True)
+  Seq = db.Column(db.CHAR(2), primary_key = True, index = True)
   Amount = db.Column(db.FLOAT(5, 3))
   Msre_Desc = db.Column(db.VARCHAR(84))
   Gm_Wgt = db.Column(db.FLOAT(7,1))
@@ -207,6 +228,17 @@ class WEIGHT(db.Model):
 
   def __repr__(self):
     return "<WEIGHT %s>" % (self.NDB_No + " - " + self.Seq)
+
+  @property
+  def serialize(self):
+    """Return object data in easily serializable format"""
+    return {
+      'NDB_No': self.NDB_No,
+      'Seq': self.Seq,
+      'Amount': self.Amount,
+      'Msre_Desc': self.Msre_Desc,
+      'Gm_Wgt': self.Gm_Wgt,
+    }
 
 class FOOTNOTE(db.Model):
   __bind_key__ = 'sr26'
