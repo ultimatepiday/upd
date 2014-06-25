@@ -56,3 +56,20 @@ def api_ingredients(food_group=None):
 @app.route("/api/weights/<NDB_No>", methods=['GET'])
 def api_weights(NDB_No=None):
   return jsonify(results=[i.serialize for i in WEIGHT.query.filter_by(NDB_No=NDB_No).all()])
+
+
+@app.route("/api/add_ingredient_map", methods=['GET', 'POST'])
+def add_ingredient_map():
+  form = IngredientMapForm(request.form, csrf_enabled=False)
+  if request.method == 'POST':
+    if form.NDB_No.validate(form):
+      NDB_No = form.NDB_No.data
+      form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=NDB_No.NDB_No).all()]
+      if form.validate_on_submit():
+        print "All things found: (%s, %s, %s, %s)" % (form.recipe_num.data, form.NDB_No.data, form.Seq.data, form.weight_value.data)
+        return redirect(url_for('omfg'))
+      else:
+        print form.errors
+  if not form.Seq.choices:
+    form.Seq.choices = []
+  return render_template('add_ingredient_map.html', form=form)
