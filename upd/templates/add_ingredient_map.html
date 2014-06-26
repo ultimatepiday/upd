@@ -1,8 +1,8 @@
 {% from "_formhelpers.html" import render_field %}
-<form method=post action="/test_field">
+<form method=post action="">
   <dl>
-    {{ render_field(form.recipe_num) }}
-    {{ render_field(form.NDB_No) }}
+    {{ render_field(form.recipe_name) }}
+    {{ render_field(form.ingredient) }}
     {{ render_field(form.Seq) }}
     {{ render_field(form.weight_value) }}
   </dl>

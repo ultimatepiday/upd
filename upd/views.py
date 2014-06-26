@@ -1,7 +1,32 @@
-from upd import app
+from upd import app, login_manager
+from flask.ext.login import login_required, login_user, logout_user, current_user
 from upd.model import *
 from flask import render_template, request, url_for, flash, redirect, jsonify
 from forms import *
+
+
+@login_manager.user_loader
+def load_user(userid):
+  return User.query.get(int(userid))
+
+def logout():
+  logout_user()
+  return redirect(url_for("index"))
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+  form = LoginForm(request.form)
+  if form.validate_on_submit():
+    username = request.form['username']
+    password = request.form['password']
+    user = User.query.filter_by(username=username).first()
+    if user:
+      if user.check_password(password):
+        login_user(user)
+        flash("Logged in successfully")
+        return redirect(request.args.get("next") or url_for("index"))
+    flash("Unsuccessful login attempt.")
+  return render_template("login.html", form=form)
 
 @app.route('/')
 def index():
@@ -59,14 +84,17 @@ def api_weights(NDB_No=None):
 
 
 @app.route("/api/add_ingredient_map", methods=['GET', 'POST'])
+@login_required
 def add_ingredient_map():
   form = IngredientMapForm(request.form, csrf_enabled=False)
   if request.method == 'POST':
-    if form.NDB_No.validate(form):
-      NDB_No = form.NDB_No.data
-      form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=NDB_No.NDB_No).all()]
+    if form.ingredient.validate(form):
+      ingredient = form.ingredient.data
+      form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=ingredient.NDB_No).all()]
       if form.validate_on_submit():
-        print "All things found: (%s, %s, %s, %s)" % (form.recipe_num.data, form.NDB_No.data, form.Seq.data, form.weight_value.data)
+        message = "All things found: (%s, %s, %s, %s)" % (form.recipe_name.data, form.ingredient.data, form.Seq.data, form.weight_value.data)
+        print message
+        flash(message)
         return redirect(url_for('omfg'))
       else:
         print form.errors

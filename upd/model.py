@@ -4,9 +4,31 @@
 #
 ##########
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from upd import app
 
 db = SQLAlchemy(app)
+
+
+class User(db.Model, UserMixin):
+  id = db.Column(db.Integer, primary_key=True)
+  username = db.Column(db.String(255), unique=True)
+  email = db.Column(db.String(255), unique=True)
+  password = db.Column(db.String(255))
+  active = db.Column(db.Boolean())
+
+  def __init__(self, username, password, email):
+    self.username = username
+    self.set_password(password)
+    self.email = email
+    self.active = True
+
+  def set_password(self, password):
+    self.password = generate_password_hash(password)
+
+  def check_password(self, password):
+    return check_password_hash(self.password, password)
 
 class Ingredient(object):
   query = db.session.query_property()
