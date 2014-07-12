@@ -1,0 +1,8 @@
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="">
+  <dl>
+    {{ render_field(form.recipe_name) }}
+    {{ render_field(form.ingredient) }}
+  </dl>
+  <p><input type=submit value=Submit /></p>
+</form>

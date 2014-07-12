@@ -39,5 +39,6 @@ class IngredientMapForm(Form):
   Seq = SelectField(u'Weight Sequence')
   weight_value = TextField(u'Weight value ', [validators.NumberRange(), validators.Required()])
 
-
-# http://stackoverflow.com/questions/19898967/how-to-use-wtforms-in-ajax-validation
+class IngredientMapFormDel(Form):
+  recipe_name = QuerySelectField(u'Pie Recipe', query_factory=form_recipe_query, get_label='recipe_name')
+  ingredient = SelectField(u'Ingredient', coerce=int)

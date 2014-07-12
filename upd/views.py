@@ -83,21 +83,35 @@ def api_weights(NDB_No=None):
   return jsonify(results=[i.serialize for i in WEIGHT.query.filter_by(NDB_No=NDB_No).all()])
 
 
-@app.route("/api/add_ingredient_map", methods=['GET', 'POST'])
+@app.route("/api/ingredient_map/<action>", methods=['GET', 'POST'])
 @login_required
-def add_ingredient_map():
-  form = IngredientMapForm(request.form, csrf_enabled=False)
-  if request.method == 'POST':
-    if form.ingredient.validate(form):
-      ingredient = form.ingredient.data
-      form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=ingredient.NDB_No).all()]
+def add_ingredient_map(action="add"):
+  if action == "add":
+    form = IngredientMapForm(request.form, csrf_enabled=False)
+    if request.method == 'POST':
+      if form.ingredient.validate(form):
+        ingredient = form.ingredient.data
+        form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=ingredient.NDB_No).all()]
+        if form.validate_on_submit():
+          message = "All things found: (%s, %s, %s, %s)" % (form.recipe_name.data, form.ingredient.data, form.Seq.data, form.weight_value.data)
+          print message
+          flash(message)
+          return redirect(url_for('omfg'))
+        else:
+          print form.errors
+    if not form.Seq.choices:
+      form.Seq.choices = []
+    return render_template('add_ingredient_map.html', form=form)
+  elif action == "delete":
+    form = IngredientMapFormDel(request.form, csrf_enabled=False)
+    if request.method == 'POST':
+      if form.recipe_name.validate(form):
+        form.ingredient.choices = [(1, 'moo')]
       if form.validate_on_submit():
-        message = "All things found: (%s, %s, %s, %s)" % (form.recipe_name.data, form.ingredient.data, form.Seq.data, form.weight_value.data)
-        print message
-        flash(message)
-        return redirect(url_for('omfg'))
-      else:
-        print form.errors
-  if not form.Seq.choices:
-    form.Seq.choices = []
-  return render_template('add_ingredient_map.html', form=form)
+        print "Deleting: %s %s" % (form.ingredient.data, form.recipe_name.data)
+        return "OK"
+    if not form.ingredient.choices:
+      form.ingredient.choices = []
+    return render_template('delete_ingredient_map.html', form=form)
+  else:
+    return "Operation not supported"
