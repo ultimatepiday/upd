@@ -117,8 +117,6 @@ def add_ingredient_map(action="add"):
         db.session.delete(ingredient)
         db.session.commit()
         return "OK"
-    #if not form.ingredient.choices:
-    #  form.ingredient.choices = []
     return render_template('delete_ingredient_map.html', form=form)
   else:
     return "Operation not supported"

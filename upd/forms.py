@@ -18,7 +18,6 @@ class TheTestForm(Form):
 def fill_field():
   return RecipeCategory.query
 
-# this seems to be a dynamic way. I don't understand how queryselectfield is re-running the select every instantiation..but this seems to be the case(??)
 class AnotherTestForm(Form):
   my_field = QuerySelectField(query_factory=fill_field, get_label='recipe_cat_name')
 
@@ -48,4 +47,3 @@ class IngredientMapForm(Form):
 class IngredientMapFormDel(Form):
   recipe_name = QuerySelectField(u'Pie Recipe', query_factory=form_recipe_query, get_label='recipe_name')
   ingredient = QuerySelectField(get_label=ingredient_label)
-  #ingredient = SelectField(u'Ingredient')
