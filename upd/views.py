@@ -93,10 +93,14 @@ def add_ingredient_map(action="add"):
         ingredient = form.ingredient.data
         form.Seq.choices = [(i.Seq,i.Msre_Desc) for i in WEIGHT.query.filter_by(NDB_No=ingredient.NDB_No).all()]
         if form.validate_on_submit():
-          message = "All things found: (%s, %s, %s, %s)" % (form.recipe_name.data, form.ingredient.data, form.Seq.data, form.weight_value.data)
-          print message
-          flash(message)
-          return redirect(url_for('omfg'))
+          recipe_num = form.recipe_name.data.recipe_num
+          NDB_No = form.ingredient.data.NDB_No
+          Seq = form.Seq.data
+          weight_value = form.weight_value.data
+          new_ingredient = Ingredient(recipe_num, NDB_No, Seq, weight_value)
+          db.session.add(new_ingredient)
+          db.session.commit()
+          return "OK"
         else:
           print form.errors
     if not form.Seq.choices:
@@ -104,14 +108,17 @@ def add_ingredient_map(action="add"):
     return render_template('add_ingredient_map.html', form=form)
   elif action == "delete":
     form = IngredientMapFormDel(request.form, csrf_enabled=False)
+    form.ingredient.query = Ingredient.query.filter_by(recipe_num=None)
     if request.method == 'POST':
       if form.recipe_name.validate(form):
-        form.ingredient.choices = [(1, 'moo')]
+        form.ingredient.query = Ingredient.query.filter_by(recipe_num=form.recipe_name.data.recipe_num)
       if form.validate_on_submit():
-        print "Deleting: %s %s" % (form.ingredient.data, form.recipe_name.data)
+        ingredient = form.ingredient.data
+        db.session.delete(ingredient)
+        db.session.commit()
         return "OK"
-    if not form.ingredient.choices:
-      form.ingredient.choices = []
+    #if not form.ingredient.choices:
+    #  form.ingredient.choices = []
     return render_template('delete_ingredient_map.html', form=form)
   else:
     return "Operation not supported"

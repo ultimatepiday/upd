@@ -32,6 +32,12 @@ def form_recipe_query():
 def form_food_des_query():
   return FOOD_DES.query.order_by(FOOD_DES.Long_Desc)
 
+def ingredient_label(ingredient):
+  Shrt_Desc = ingredient.food_des.Shrt_Desc
+  weight_value = ingredient.weight_value
+  Msre_Desc = WEIGHT.query.get((ingredient.NDB_No, ingredient.Seq)).Msre_Desc
+  return "%s, %s %s" % (Shrt_Desc, weight_value, Msre_Desc)
+
 # form to map ingredients to recipes
 class IngredientMapForm(Form):
   recipe_name = QuerySelectField(u'Pie Recipe', query_factory=form_recipe_query, get_label='recipe_name')
@@ -41,4 +47,5 @@ class IngredientMapForm(Form):
 
 class IngredientMapFormDel(Form):
   recipe_name = QuerySelectField(u'Pie Recipe', query_factory=form_recipe_query, get_label='recipe_name')
-  ingredient = SelectField(u'Ingredient', coerce=int)
+  ingredient = QuerySelectField(get_label=ingredient_label)
+  #ingredient = SelectField(u'Ingredient')
